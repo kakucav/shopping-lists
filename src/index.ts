@@ -1,11 +1,19 @@
-import express from "express";
+import "dotenv/config";
+import express, { json } from "express";
+import { connectToDB } from "./database/connection";
+import authRouter from "./routes/auth.router";
+import shoppingListRouter from "./routes/shopping-list.router";
 
 const app = express();
+const port: Number = Number(process.env.PORT) || 5000;
+const connectionString = process.env.DB_CONNECTION_STRING;
 
-app.get("/", (req, res) => {
-  res.send("running...");
-});
+app.use(json());
 
-app.listen(5000, () => {
-  console.log("Application is running on port 5000...");
+app.use("/api/auth", authRouter);
+app.use("/api/shopping-lists", shoppingListRouter);
+
+app.listen(port, async () => {
+  console.log(`Application is running on port ${port}...`);
+  await connectToDB(connectionString);
 });
