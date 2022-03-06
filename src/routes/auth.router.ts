@@ -4,12 +4,21 @@ import {
   register,
   updatePassword,
 } from "../controllers/auth.controller";
-import { validateRegistration } from "../middleware/validation";
+import authenticateJWT from "../middleware/authenticateJWT";
+import {
+  validateRegistration,
+  validateUpdatePassword,
+} from "../middleware/validation";
 
 const authRouter = Router();
 
 authRouter.post("/register", validateRegistration, register);
 authRouter.post("/login", login);
-authRouter.post("/update-password", updatePassword);
+authRouter.put(
+  "/update-password",
+  validateUpdatePassword,
+  authenticateJWT,
+  updatePassword
+);
 
 export default authRouter;

@@ -8,10 +8,27 @@ export const validateRegistration = (
 ) => {
   const { email, password } = req.body;
 
+  if (!email || !password)
+    return res
+      .status(400)
+      .json({ message: "Email and password are required fields!" });
   if (!isEmail(email))
     return res.status(400).json({ message: "Email is not valid!" });
   if (password.length < 6)
     return res.status(400).json({ message: "Password too short!" });
+
+  next();
+};
+
+export const validateUpdatePassword = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  const { email, password } = req.body;
+
+  if (!password || password.length < 6)
+    return res.status(400).json({ message: "Password not sent or too short!" });
 
   next();
 };

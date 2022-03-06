@@ -1,17 +1,14 @@
 import { Request, Response } from "express";
-import User from "../models/user.model";
-import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken";
+import * as userService from "../services/user.service";
 
 export const register = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
 
-    if (await getUserIfExists(email))
+    if (await userService.getUserIfExists(email))
       return res.status(409).json({ message: "Email already taken!" });
 
-    const user = new User({ email, password });
-    await user.save();
+    const user = await userService.createUser({ email, password });
 
     return res.status(201).json({ data: { user } });
   } catch (error) {
@@ -23,14 +20,14 @@ export const login = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
 
-    const user = await getUserIfExists(email);
+    const user = await userService.getUserIfExists(email);
     if (!user)
       return res.status(404).json({ message: "Incorrect email or password!" });
 
-    if (!(await checkIfPasswordsMatch(password, user.password)))
+    if (!(await userService.checkIfPasswordsMatch(password, user.password)))
       return res.status(404).json({ message: "Incorrect email or password!" });
 
-    const token = generateJWT(email);
+    const token = userService.generateJWT(email);
 
     return res.status(200).json({ data: { token } });
   } catch (error) {
@@ -38,21 +35,14 @@ export const login = async (req: Request, res: Response) => {
   }
 };
 
-export const updatePassword = async (req: Request, res: Response) => {};
+export const updatePassword = async (req: Request | any, res: Response) => {
+  try {
+    const { password } = req.body;
 
-const getUserIfExists = async (email: string) => {
-  return await User.findOne({ email });
-};
+    await userService.updatePassword(req.user, password);
 
-const checkIfPasswordsMatch = async (
-  password: string,
-  passwordHash: string
-) => {
-  return await bcrypt.compare(password, passwordHash);
-};
-
-const generateJWT = (email: string) => {
-  return jwt.sign({ email }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRE_TIME,
-  });
+    return res.status(200).json({ message: "Password changed!" });
+  } catch (error) {
+    return res.status(500).json({ error });
+  }
 };
