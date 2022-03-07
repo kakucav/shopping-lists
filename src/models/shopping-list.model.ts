@@ -3,19 +3,27 @@ import { Document, Schema, model, Types } from "mongoose";
 export interface IShoppingList extends Document {
   name: string;
   userId: Types.ObjectId;
-  createdAt: Date;
   products: {
     _id: Types.ObjectId;
     quantity: number;
   }[];
+  isDeleted: boolean;
 }
 
 const shoppingListSchema = new Schema(
   {
     name: { type: String, required: true },
     userId: { type: Types.ObjectId, ref: "User", required: true },
-    products: [{ _id: Types.ObjectId, quantity: Number }],
-    default: [],
+    products: {
+      type: [
+        {
+          _id: { type: Types.ObjectId, ref: "Product", required: true },
+          quantity: { type: Number, required: true },
+        },
+      ],
+      default: [],
+    },
+    isDeleted: { type: Boolean, default: false, select: false },
   },
   {
     timestamps: true,
