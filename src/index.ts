@@ -4,6 +4,7 @@ import seedProducts from "./data/products";
 import { connectToDB } from "./database/connection";
 import authRouter from "./routes/auth.router";
 import shoppingListRouter from "./routes/shopping-list.router";
+import "./models/product.model";
 
 const app = express();
 const port: Number = Number(process.env.PORT) || 5000;

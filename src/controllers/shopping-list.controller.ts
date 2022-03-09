@@ -21,7 +21,26 @@ export const createList = async (req: Request | any, res: Response) => {
   }
 };
 
-export const updateList = async (req: Request, res: Response) => {};
+export const updateList = async (req: Request | any, res: Response) => {
+  try {
+    const id = req.params.id;
+    const user = req.user;
+    const { name, products } = req.body;
+
+    const shoppingList = await shoppingListService.getIfBelongsToUser(
+      id,
+      user._id
+    );
+
+    if (!shoppingList) return res.status(404).json({ message: "Not found!" });
+
+    await shoppingListService.updateShoppingList(shoppingList, name, products);
+
+    return res.status(200).json({ message: "Shopping list updated!" });
+  } catch (error) {
+    return res.status(500).json({ error });
+  }
+};
 
 export const deleteList = async (req: Request | any, res: Response) => {
   try {
@@ -39,6 +58,29 @@ export const deleteList = async (req: Request | any, res: Response) => {
 
     return res.status(200).json({ message: "List deleted!" });
   } catch (error) {
+    return res.status(500).json({ error });
+  }
+};
+
+export const getReport = async (req: Request | any, res: Response) => {
+  try {
+    const user = req.user;
+    const { startDate, endDate } = req.body;
+
+    const report = await shoppingListService.getReport(
+      user._id,
+      startDate,
+      endDate
+    );
+
+    return res.status(200).json({
+      data: {
+        report,
+      },
+    });
+  } catch (error) {
+    console.log(error);
+
     return res.status(500).json({ error });
   }
 };

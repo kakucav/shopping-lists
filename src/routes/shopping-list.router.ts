@@ -19,5 +19,10 @@ shoppingListRouter.delete(
   authenticateJWT,
   shoppingListController.deleteList
 );
+shoppingListRouter.get(
+  "/get-report",
+  authenticateJWT,
+  shoppingListController.getReport
+);
 
 export default shoppingListRouter;
