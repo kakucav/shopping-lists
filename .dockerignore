@@ -1,0 +1,7 @@
+node_modules
+
+packace*.json
+
+Dockerfile
+.dockerignore
+docker-compose.yml
